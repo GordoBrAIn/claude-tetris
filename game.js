@@ -4,17 +4,48 @@ const COLS = 10;
 const ROWS = 20;
 const BLOCK = 30;
 
-const COLORS = [
-  null,
-  '#4dd0e1', // I - cyan
-  '#ffd54f', // O - yellow
-  '#ba68c8', // T - purple
-  '#81c784', // S - green
-  '#e57373', // Z - red
-  '#7986cb', // J - indigo
-  '#ffb74d', // L - orange
-  '#f06292', // Nut - pink
-];
+const THEMES = {
+  retro: {
+    name: 'Retro',
+    colors: [null, '#4dd0e1', '#ffd54f', '#ba68c8', '#81c784', '#e57373', '#7986cb', '#ffb74d', '#f06292'],
+    grid: '#22222e',
+    boardBg: '#1a1a25',
+    border: '#2a2a3a',
+    style: 'flat',
+  },
+  neon: {
+    name: 'Neon',
+    colors: [null, '#00fff2', '#fff200', '#d400ff', '#39ff14', '#ff073a', '#4d6bff', '#ff9500', '#ff2bd6'],
+    grid: '#10101a',
+    boardBg: '#000000',
+    border: '#1a1a2e',
+    style: 'neon',
+  },
+  pastel: {
+    name: 'Pastel',
+    colors: [null, '#a8e6ef', '#fff1b8', '#d9b8f0', '#b9e8bf', '#f5b8b8', '#b8c4f0', '#ffd9b0', '#f8bcd4'],
+    grid: '#d9d4e4',
+    boardBg: '#f4f0fa',
+    border: '#cfc8de',
+    style: 'pastel',
+  },
+  pixel: {
+    name: 'Pixel art',
+    colors: [null, '#29b6c9', '#e6b422', '#9c4dcc', '#4caf50', '#d32f2f', '#3f51b5', '#ef8a17', '#e91e63'],
+    grid: '#1c1c28',
+    boardBg: '#12121c',
+    border: '#2a2a3a',
+    style: 'pixel',
+  },
+};
+
+const THEME_KEY = 'tetris-theme';
+let themeName = 'retro';
+try {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved && THEMES[saved]) themeName = saved;
+} catch (e) { /* localStorage unavailable */ }
+let theme = THEMES[themeName];
 
 const PIECES = [
   null,
@@ -41,6 +72,7 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const themeSelect = document.getElementById('theme-select');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
@@ -158,20 +190,85 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
+function roundRectPath(context, x, y, w, h, r) {
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + w, y, x + w, y + h, r);
+  context.arcTo(x + w, y + h, x, y + h, r);
+  context.arcTo(x, y + h, x, y, r);
+  context.arcTo(x, y, x + w, y, r);
+  context.closePath();
+}
+
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
+  const color = theme.colors[colorIndex];
+  const px = x * size + 1, py = y * size + 1, s = size - 2;
+  context.save();
   context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
-  context.globalAlpha = 1;
+  switch (theme.style) {
+    case 'neon':
+      context.shadowColor = color;
+      context.shadowBlur = 12;
+      context.strokeStyle = color;
+      context.lineWidth = 2;
+      context.strokeRect(px + 2, py + 2, s - 4, s - 4);
+      context.shadowBlur = 0;
+      context.fillStyle = color;
+      context.globalAlpha = (alpha ?? 1) * 0.35;
+      context.fillRect(px + 2, py + 2, s - 4, s - 4);
+      break;
+    case 'pastel':
+      context.fillStyle = color;
+      roundRectPath(context, px, py, s, s, size * 0.28);
+      context.fill();
+      context.fillStyle = 'rgba(255,255,255,0.45)';
+      roundRectPath(context, px + 3, py + 3, s - 6, 4, 2);
+      context.fill();
+      break;
+    case 'pixel': {
+      context.fillStyle = color;
+      context.fillRect(px, py, s, s);
+      const u = Math.max(2, Math.round(size / 10)); // pixel unit
+      // light top/left, dark bottom/right bevel
+      context.fillStyle = 'rgba(255,255,255,0.35)';
+      context.fillRect(px, py, s, u);
+      context.fillRect(px, py, u, s);
+      context.fillStyle = 'rgba(0,0,0,0.35)';
+      context.fillRect(px, py + s - u, s, u);
+      context.fillRect(px + s - u, py, u, s);
+      // checker texture
+      context.fillStyle = 'rgba(0,0,0,0.15)';
+      for (let i = u * 2; i < s - u * 2; i += u * 2)
+        for (let j = u * 2; j < s - u * 2; j += u * 2)
+          if (((i + j) / (u * 2)) % 2 === 0) context.fillRect(px + i, py + j, u, u);
+      break;
+    }
+    default: // flat / retro
+      context.fillStyle = color;
+      context.fillRect(px, py, s, s);
+      context.fillStyle = 'rgba(255,255,255,0.12)';
+      context.fillRect(px, py, s, 4);
+  }
+  context.restore();
+}
+
+function applyTheme(name, persist) {
+  if (!THEMES[name]) name = 'retro';
+  themeName = name;
+  theme = THEMES[name];
+  document.body.dataset.theme = name;
+  document.documentElement.style.setProperty('--board-bg', theme.boardBg);
+  document.documentElement.style.setProperty('--board-border', theme.border);
+  themeSelect.value = name;
+  if (persist) {
+    try { localStorage.setItem(THEME_KEY, name); } catch (e) { /* ignore */ }
+  }
+  if (current && next) { draw(); drawNext(); }
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = theme.grid;
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -304,5 +401,17 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+
+for (const [key, t] of Object.entries(THEMES)) {
+  const opt = document.createElement('option');
+  opt.value = key;
+  opt.textContent = t.name;
+  themeSelect.appendChild(opt);
+}
+themeSelect.addEventListener('change', () => {
+  applyTheme(themeSelect.value, true);
+  themeSelect.blur(); // keep keys (arrows/space) for the game
+});
+applyTheme(themeName, false);
 
 init();
