@@ -150,3 +150,71 @@ kbd {
 #restart-btn:hover {
   background: #9bbdff;
 }
+
+/* Records */
+.start-title {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #7aa2f7;
+}
+
+.records { gap: 8px; }
+
+.rec-list {
+  list-style: none;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  color: #e0e0e0;
+  min-width: 280px;
+}
+
+.rec-list li {
+  display: grid;
+  grid-template-columns: 24px 1fr 64px 40px 72px;
+  gap: 6px;
+  padding: 3px 6px;
+  text-align: left;
+  border-radius: 3px;
+}
+
+.rec-list li.rec-empty { display: block; text-align: center; color: #7a7a8c; }
+.rec-list li.rec-current { background: rgba(255, 213, 79, 0.2); color: #ffd54f; font-weight: 700; }
+
+.rec-stats {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  color: #7aa2f7;
+}
+
+#name-form { display: flex; flex-direction: column; gap: 6px; align-items: center; font-size: 13px; }
+#name-form.hidden, #gameover-records.hidden { display: none; }
+
+#name-input {
+  background: #15151f;
+  color: #e0e0e0;
+  border: 1px solid #2a2a3a;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  user-select: text;
+}
+
+.rec-btn {
+  background: #2a2a3a;
+  color: #e0e0e0;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rec-btn:hover { background: #3a3a4e; }
+.rec-primary { background: #7aa2f7; color: #0f0f17; padding: 10px 28px; font-size: 14px; }
+.rec-primary:hover { background: #9bbdff; }
+.rec-reset { color: #e57373; }
