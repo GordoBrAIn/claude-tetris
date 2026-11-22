@@ -27,8 +27,8 @@ body {
 
 #board {
   display: block;
-  border: 1px solid #2a2a3a;
-  background: #1a1a25;
+  border: 1px solid var(--board-border, #2a2a3a);
+  background: var(--board-bg, #1a1a25);
   border-radius: 4px;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
 }
@@ -65,8 +65,8 @@ body {
 
 #next-canvas {
   display: block;
-  border: 1px solid #2a2a3a;
-  background: #1a1a25;
+  border: 1px solid var(--board-border, #2a2a3a);
+  background: var(--board-bg, #1a1a25);
   border-radius: 4px;
 }
 
@@ -150,3 +150,160 @@ kbd {
 #restart-btn:hover {
   background: #9bbdff;
 }
+
+/* ---- Pause menu ---- */
+.hidden {
+  display: none !important;
+}
+
+.menu-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #7aa2f7;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  min-width: 200px;
+}
+
+.menu-btn {
+  background: #7aa2f7;
+  color: #0f0f17;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+
+.menu-btn:hover,
+.menu-btn:focus-visible {
+  background: #9bbdff;
+  outline: none;
+}
+
+.menu-level {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 1px;
+}
+
+.menu-level select {
+  background: #1a1a26;
+  color: #e0e0e0;
+  border: 1px solid #7aa2f7;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.menu-hint {
+  font-size: 11px;
+  color: #777;
+}
+
+.menu-keys {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: #ccc;
+  text-align: left;
+}
+
+/* ---- Records ---- */
+.hidden { display: none !important; }
+
+.name-form { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+#name-msg { font-size: 13px; color: #ffd54f; }
+.name-row { display: flex; gap: 6px; }
+
+#name-input {
+  background: #1a1a25;
+  border: 1px solid #3a3a5a;
+  border-radius: 6px;
+  padding: 8px 10px;
+  width: 140px;
+  color: #e0e0f0;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+#save-btn, #reset-btn {
+  background: #22223a;
+  color: #aaa;
+  border: 1px solid #3a3a5a;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#save-btn { background: #7aa2f7; color: #0f0f17; border: none; }
+#reset-btn:hover { color: #e57373; border-color: #e57373; }
+
+.records { display: flex; flex-direction: column; gap: 6px; align-items: center; min-width: 220px; }
+
+#records-list {
+  list-style: none;
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  color: #aaa;
+}
+
+#records-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+#records-list li.highlight { background: rgba(255, 213, 79, 0.18); color: #ffd54f; font-weight: 700; }
+#records-list li.empty { color: #555; }
+
+#records-stats { font-size: 12px; color: #888; }
+
+/* ---- Selector de tema ---- */
+#theme-select {
+  background: #22223a;
+  color: #e0e0e0;
+  border: 1px solid #3a3a5a;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ---- Temas ---- */
+body[data-theme="neon"] #board { box-shadow: 0 0 24px rgba(0, 255, 242, 0.25); }
+body[data-theme="neon"] .value { color: #00fff2; text-shadow: 0 0 8px #00fff2; }
+body[data-theme="pastel"] { background: #e9e3f5; color: #4a4560; }
+body[data-theme="pastel"] .value { color: #8a6fc2; }
+body[data-theme="pastel"] .label { color: #8d86a6; }
+body[data-theme="pastel"] .controls li { color: #6b6585; }
+body[data-theme="pastel"] #board { box-shadow: 0 0 30px rgba(120, 100, 170, 0.2); }
+body[data-theme="pixel"] .value,
+body[data-theme="pixel"] .label,
+body[data-theme="pixel"] #overlay-title { font-family: 'Courier New', monospace; }
+body[data-theme="pixel"] #board,
+body[data-theme="pixel"] #next-canvas { image-rendering: pixelated; border-radius: 0; }
